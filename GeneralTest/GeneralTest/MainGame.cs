@@ -1,12 +1,12 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Resources.Classes;
+using Resources;
 
 namespace GeneralTest
 {
     public class MainGame : GameBase
     {
-        protected override Resources.ITestComponent GetTest
+        protected override ITestComponent GetTest
         {
             get { return new TestComponent(this); }
         }
