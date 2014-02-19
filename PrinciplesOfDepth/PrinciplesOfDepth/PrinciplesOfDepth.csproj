@@ -4,15 +4,15 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{3BA78C92-776E-42E7-9E36-FFA89E05DA83}</ProjectGuid>
+    <ProjectGuid>{74438886-D8C4-4762-B3E0-25E18AB55ADE}</ProjectGuid>
     <OutputType>AppContainerExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>GeneralTest</RootNamespace>
-    <AssemblyName>GeneralTest</AssemblyName>
+    <RootNamespace>PrinciplesOfDepth</RootNamespace>
+    <AssemblyName>PrinciplesOfDepth</AssemblyName>
     <DefaultLanguage>en-US</DefaultLanguage>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{BC8A1FFA-BEE3-4634-8014-F334798102B3};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
-    <PackageCertificateKeyFile>GeneralTest_TemporaryKey.pfx</PackageCertificateKeyFile>
+    <PackageCertificateKeyFile>PrinciplesOfDepth_TemporaryKey.pfx</PackageCertificateKeyFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -136,92 +136,32 @@
     <Compile Include="..\..\Resources\Classes\Joystick.cs">
       <Link>Resources\Joystick.cs</Link>
     </Compile>
-    <Compile Include="Program.cs" />
+    <Compile Include="Background.cs" />
     <Compile Include="MainGame.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="Runner.cs" />
+    <Compile Include="Snowman.cs" />
+    <Compile Include="Sprite.cs" />
     <Compile Include="TestComponent.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <AppxManifest Include="Package.appxmanifest">
       <SubType>Designer</SubType>
     </AppxManifest>
-    <Content Include="..\..\Resources\Xnb\Arrow.xnb">
-      <Link>Content\Arrow.xnb</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <Content Include="..\..\Resources\Xnb\background.xnb">
       <Link>Content\background.xnb</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\..\Resources\Xnb\Ball.xnb">
-      <Link>Content\Ball.xnb</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\..\Resources\Xnb\blocks.xnb">
-      <Link>Content\blocks.xnb</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\..\Resources\Xnb\blurred_snowman.xnb">
-      <Link>Content\blurred_snowman.xnb</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\..\Resources\Xnb\circle.xnb">
-      <Link>Content\circle.xnb</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\..\Resources\Xnb\grassland_tiles.xnb">
-      <Link>Content\grassland_tiles.xnb</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\..\Resources\Xnb\map01.xnb">
-      <Link>Content\map01.xnb</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\..\Resources\Xnb\myFont.xnb">
-      <Link>Content\myFont.xnb</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\..\Resources\Xnb\quilt_piece.xnb">
-      <Link>Content\quilt_piece.xnb</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\..\Resources\Xnb\Rectangle.xnb">
-      <Link>Content\Rectangle.xnb</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="..\..\Resources\Xnb\run_cycle.xnb">
       <Link>Content\run_cycle.xnb</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\..\Resources\Xnb\Segoe.xnb">
-      <Link>Content\Segoe.xnb</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\..\Resources\Xnb\snowFlake.xnb">
-      <Link>Content\snowFlake.xnb</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <Content Include="..\..\Resources\Xnb\snow_assets.xnb">
       <Link>Content\snow_assets.xnb</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\..\Resources\Xnb\snow_bg.xnb">
-      <Link>Content\snow_bg.xnb</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\..\Resources\Xnb\tiledSprites.xnb">
-      <Link>Content\tiledSprites.xnb</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\..\Resources\Xnb\whiteCircle.xnb">
-      <Link>Content\whiteCircle.xnb</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\..\Resources\Xnb\whiteStar.xnb">
-      <Link>Content\whiteStar.xnb</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <None Include="GeneralTest_TemporaryKey.pfx" />
+    <None Include="PrinciplesOfDepth_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Assets\Logo.png" />
@@ -229,7 +169,6 @@
     <Content Include="Assets\SplashScreen.png" />
     <Content Include="Assets\StoreLogo.png" />
   </ItemGroup>
-  <ItemGroup />
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '12.0' ">
     <VisualStudioVersion>12.0</VisualStudioVersion>
   </PropertyGroup>
