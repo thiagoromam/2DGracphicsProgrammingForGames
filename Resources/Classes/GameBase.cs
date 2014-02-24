@@ -1,7 +1,5 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
-using System;
 
 namespace Resources
 {
@@ -16,8 +14,7 @@ namespace Resources
 
         protected GameBase()
         {
-            Graphics = new GraphicsDeviceManager(this);
-            Graphics.IsFullScreen = true;
+            Graphics = new GraphicsDeviceManager(this) { IsFullScreen = true };
             Content.RootDirectory = "Content";
 
             BackgroundColor = Color.CornflowerBlue;
