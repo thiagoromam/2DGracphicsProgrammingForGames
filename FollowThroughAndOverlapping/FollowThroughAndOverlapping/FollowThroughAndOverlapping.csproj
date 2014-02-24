@@ -4,15 +4,15 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{DB60A71F-9968-407B-A5FA-F6CC1261E4DD}</ProjectGuid>
+    <ProjectGuid>{DA3DB145-C66B-443F-AC18-878C1B66298E}</ProjectGuid>
     <OutputType>AppContainerExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>FollowThroughOverlapping</RootNamespace>
-    <AssemblyName>FollowThroughOverlapping</AssemblyName>
+    <RootNamespace>FollowThroughAndOverlapping</RootNamespace>
+    <AssemblyName>FollowThroughAndOverlapping</AssemblyName>
     <DefaultLanguage>en-US</DefaultLanguage>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{BC8A1FFA-BEE3-4634-8014-F334798102B3};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
-    <PackageCertificateKeyFile>FollowThroughOverlapping_TemporaryKey.pfx</PackageCertificateKeyFile>
+    <PackageCertificateKeyFile>FollowThroughAndOverlapping_TemporaryKey.pfx</PackageCertificateKeyFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -149,7 +149,7 @@
       <Link>Content\Rectangle.xnb</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <None Include="FollowThroughOverlapping_TemporaryKey.pfx" />
+    <None Include="FollowThroughAndOverlapping_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Assets\Logo.png" />

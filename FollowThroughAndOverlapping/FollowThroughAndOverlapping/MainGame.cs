@@ -1,6 +1,6 @@
 ﻿using Resources;
 
-namespace FollowThroughOverlapping
+namespace FollowThroughAndOverlapping
 {
     public class MainGame : GameBase
     {

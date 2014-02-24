@@ -6,7 +6,7 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Resources;
 
-namespace FollowThroughOverlapping
+namespace FollowThroughAndOverlapping
 {
     public class TestComponent : ITestComponent
     {

@@ -1,12 +1,12 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Package xmlns="http://schemas.microsoft.com/appx/2010/manifest">
 
-  <Identity Name="9fbf232e-8352-4519-98fd-de8cba111cb8"
+  <Identity Name="c98601ae-051b-4ac4-85a7-37dcbc5882fc"
             Publisher="CN=romam"
             Version="1.0.0.0" />
 
   <Properties>
-    <DisplayName>FollowThroughOverlapping</DisplayName>
+    <DisplayName>FollowThroughAndOverlapping</DisplayName>
     <PublisherDisplayName>romam</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
   </Properties>
@@ -23,12 +23,12 @@
   <Applications>
     <Application Id="App"
         Executable="$targetnametoken$.exe"
-        EntryPoint="FollowThroughOverlapping.App">
+        EntryPoint="FollowThroughAndOverlapping.App">
         <VisualElements
-            DisplayName="FollowThroughOverlapping"
+            DisplayName="FollowThroughAndOverlapping"
             Logo="Assets\Logo.png"
             SmallLogo="Assets\SmallLogo.png"
-            Description="FollowThroughOverlapping"
+            Description="FollowThroughAndOverlapping"
             ForegroundText="light"
             BackgroundColor="#464646">
             <DefaultTile ShowName="allLogos" />

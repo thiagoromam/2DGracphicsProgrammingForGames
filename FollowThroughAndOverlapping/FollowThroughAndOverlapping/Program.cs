@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace FollowThroughOverlapping
+namespace FollowThroughAndOverlapping
 {
     /// <summary>
     /// The main class.
