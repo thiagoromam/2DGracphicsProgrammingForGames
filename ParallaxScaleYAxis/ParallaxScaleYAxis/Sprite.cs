@@ -47,22 +47,19 @@ namespace ParallaxScaleYAxis
 
         public void Draw(SpriteBatch spriteBatch, Vector2 cameraPosition)
         {
-            var drawPosition = Position;
-            drawPosition.X -= cameraPosition.X;
-            drawPosition.X *= Scale;
-            drawPosition.X += TestComponent.BufferWidth / 2;
+            spriteBatch.Draw(_texture, GetDrawPosition(cameraPosition), Location, Color, Rotation, Origin, Scale, Effects, Depth);
+        }
 
-            spriteBatch.Draw(
-                _texture,
-                drawPosition,
-                Location,
-                Color,
-                Rotation,
-                Origin,
-                Scale,
-                Effects,
-                Depth
-                );
+        private Vector2 GetDrawPosition(Vector2 cameraPosition)
+        {
+            var drawPosition = Position;
+            drawPosition -= cameraPosition;
+            drawPosition.X *= Scale;
+
+            drawPosition.X += TestComponent.BufferWidth / 2;
+            drawPosition.Y += TestComponent.BufferHeight / 2;
+
+            return drawPosition;
         }
 
         private void UpdateDepth()
@@ -72,7 +69,7 @@ namespace ParallaxScaleYAxis
 
         private void UpdateScale()
         {
-            Scale = 0.25f + (Depth * 0.75f);
+            Scale = TestComponent.ScaleFromOriginalSize + (Depth * TestComponent.ScaleFromDepth);
 
             //const float eyeLevel = 70; // runner
             //const float eyeLevel = 135; // snowman

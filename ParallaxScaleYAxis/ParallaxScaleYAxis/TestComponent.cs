@@ -1,9 +1,9 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
-using System;
 using ParallaxScaleYAxis;
 
+// ReSharper disable ForCanBeConvertedToForeach
 // ReSharper disable once CheckNamespace
 namespace Resources
 {
@@ -15,8 +15,9 @@ namespace Resources
 
         private readonly Sprite _background;
         private readonly Runner _runner;
-        private readonly Runner _runner2;
         private Snowman[] _snowmen;
+        public static float ScaleFromOriginalSize = 0.25f;
+        public static float ScaleFromDepth = 0.75f;
 
         public TestComponent(GameBase game)
         {
@@ -25,7 +26,6 @@ namespace Resources
 
             _background = new Background();
             _runner = new Runner();
-            _runner2 = new Runner();
         }
 
         public void Initialize()
@@ -33,17 +33,13 @@ namespace Resources
             _runner.Initialize();
             _runner.Position = new Vector2(400, 680);
 
-            _runner2.Initialize();
-            _runner2.Position = new Vector2(600, 400);
-
             _snowmen = new Snowman[36];
-            var snowmenQuadrant = 6;
-            var random = new Random();
-            for (int i = 0; i < snowmenQuadrant; i++)
+            const int snowmenQuadrant = 6;
+            for (var i = 0; i < snowmenQuadrant; ++i)
             {
                 var y = Horizon + i * 80;
 
-                for (int j = 0; j < snowmenQuadrant; j++)
+                for (var j = 0; j < snowmenQuadrant; ++j)
                 {
                     var x = 130 + j * 200;
 
@@ -61,9 +57,8 @@ namespace Resources
         public void LoadContent(ContentManager content)
         {
             _runner.LoadConent(content, "run_cycle");
-            _runner2.LoadConent(content, "run_cycle");
 
-            for (int i = 0; i < _snowmen.Length; i++)
+            for (var i = 0; i < _snowmen.Length; i++)
                 _snowmen[i].LoadConent(content, "snow_assets");
 
             _background.LoadConent(content, "background");
@@ -71,6 +66,8 @@ namespace Resources
 
         public void Update(GameTime gameTime)
         {
+            UpdateScaleValues(gameTime);
+
             _runner.IsRunning = false;
 
             if (Joystick.Player1.IsUpPressing)
@@ -98,10 +95,25 @@ namespace Resources
             }
 
             _runner.Update(gameTime);
-            _runner2.Update(gameTime);
 
-            for (int i = 0; i < _snowmen.Length; i++)
+            for (var i = 0; i < _snowmen.Length; ++i)
                 _snowmen[i].Update(gameTime);
+        }
+
+        public void UpdateScaleValues(GameTime gameTime)
+        {
+            if (Joystick.Player1.IsSumPressing)
+            {
+                var value = gameTime.ValueForEverySecond(0.05f);
+                ScaleFromOriginalSize += value;
+                ScaleFromDepth -= value;
+            }
+            else if (Joystick.Player1.IsMinusPressing)
+            {
+                var value = gameTime.ValueForEverySecond(0.05f);
+                ScaleFromOriginalSize -= value;
+                ScaleFromDepth += value;
+            }
         }
 
         public void Draw(SpriteBatch spriteBatch)
@@ -112,9 +124,8 @@ namespace Resources
 
             _background.Draw(spriteBatch, cameraPosition);
             _runner.Draw(spriteBatch, cameraPosition);
-            _runner2.Draw(spriteBatch, cameraPosition);
 
-            for (int i = 0; i < _snowmen.Length; i++)
+            for (var i = 0; i < _snowmen.Length; ++i)
                 _snowmen[i].Draw(spriteBatch, cameraPosition);
 
             spriteBatch.End();

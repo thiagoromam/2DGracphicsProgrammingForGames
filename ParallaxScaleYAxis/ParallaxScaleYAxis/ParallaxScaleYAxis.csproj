@@ -130,6 +130,9 @@
     <Compile Include="..\..\Resources\Classes\GameBaseV2.cs">
       <Link>Resources\GameBaseV2.cs</Link>
     </Compile>
+    <Compile Include="..\..\Resources\Classes\Helper.cs">
+      <Link>Resources\Helper.cs</Link>
+    </Compile>
     <Compile Include="..\..\Resources\Classes\Joystick.cs">
       <Link>Resources\Joystick.cs</Link>
     </Compile>
