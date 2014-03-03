@@ -3,13 +3,13 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 
 // ReSharper disable once CheckNamespace
-namespace Resources
+namespace Core
 {
     public class TestComponent
     {
-		private readonly GameBase _game;
+		private readonly Game _game;
 	
-		public TestComponent(GameBase game)
+		public TestComponent(Game game)
 		{
 			_game = game;
 		}
