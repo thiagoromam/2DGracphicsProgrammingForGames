@@ -6,7 +6,7 @@ namespace Core
     public class MainGame : Game
     {
         public readonly GraphicsDeviceManager Graphics;
-        private SpriteBatch _spriteBatch;
+        public SpriteBatch SpriteBatch;
         public Color BackgroundColor;
 
         private readonly TestComponent _test;
@@ -32,7 +32,7 @@ namespace Core
 
         protected override void LoadContent()
         {
-            _spriteBatch = new SpriteBatch(GraphicsDevice);
+            SpriteBatch = new SpriteBatch(GraphicsDevice);
             _test.LoadContent(Content);
         }
 
@@ -48,7 +48,7 @@ namespace Core
         {
             GraphicsDevice.Clear(BackgroundColor);
 
-            _test.Draw(_spriteBatch);
+            _test.Draw(SpriteBatch);
 
             base.Draw(gameTime);
         }
