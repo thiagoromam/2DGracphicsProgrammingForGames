@@ -127,17 +127,16 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\..\Resources\Classes\GameBase.cs">
-      <Link>Resources\GameBase.cs</Link>
+    <Compile Include="..\..\Resources\Classes\Helper.cs">
+      <Link>Core\Helper.cs</Link>
     </Compile>
-    <Compile Include="..\..\Resources\Classes\ITestComponent.cs">
-      <Link>Resources\ITestComponent.cs</Link>
+    <Compile Include="..\..\Resources\Classes\JoystickV2.cs">
+      <Link>Core\JoystickV2.cs</Link>
     </Compile>
-    <Compile Include="..\..\Resources\Classes\Joystick.cs">
-      <Link>Resources\Joystick.cs</Link>
+    <Compile Include="..\..\Resources\Classes\MainGame.cs">
+      <Link>Core\MainGame.cs</Link>
     </Compile>
     <Compile Include="Program.cs" />
-    <Compile Include="MainGame.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TestComponent.cs" />
   </ItemGroup>

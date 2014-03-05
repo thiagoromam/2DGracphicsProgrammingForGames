@@ -7,9 +7,9 @@ namespace Core
 {
     public class TestComponent
     {
-		private readonly Game _game;
+		private readonly MainGame _game;
 	
-		public TestComponent(Game game)
+		public TestComponent(MainGame game)
 		{
 			_game = game;
 		}

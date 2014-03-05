@@ -1,292 +1,166 @@
-﻿using System;
-using Resources;
+using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using Resources;
 
-namespace GeneralTest
+// ReSharper disable once CheckNamespace
+namespace Core
 {
-    public class TestComponent : ITestComponent
+    public class TestComponent
     {
-        private MainGame _game;
-
-        public const int BufferWidth = 1280;
-        public const int BufferHeight = 720;
-        public const int Horizon = 240;
-
-        private Sprite _background;
-        private Runner _runner;
-        private Runner _runner2;
-        private Snowman[] _snowmen;
-
-        private Vector2 _cameraOffset;
-        private Vector2 _cameraPosition;
+        private readonly MainGame _game;
+        private Particle _particle;
+        private readonly Joystick _joystick;
 
         public TestComponent(MainGame game)
         {
             _game = game;
-            _game.Graphics.PreferredBackBufferWidth = BufferWidth;
-            _game.Graphics.PreferredBackBufferHeight = BufferHeight;
-
-            _background = new Background();
-            _runner = new Runner();
-            _runner2 = new Runner();
+            _joystick = Joystick.Player1;
         }
 
         public void Initialize()
         {
-            _runner.Initialize();
-            _runner.Position = new Vector2(400, 680);
-
-            _runner2.Initialize();
-            _runner2.Position = new Vector2(600, 400);
-
-            _snowmen = new Snowman[36];
-            var snowmenQuadrant = 6;
-            var random = new Random();
-            for (int i = 0; i < snowmenQuadrant; i++)
-            {
-                var y = Horizon + i * 80;
-
-                for (int j = 0; j < snowmenQuadrant; j++)
-                {
-                    var x = 130 + j * 200;
-
-                    var snowman = new Snowman();
-                    snowman.Initialize();
-                    snowman.Position = new Vector2(x, y);
-
-                    _snowmen[snowmenQuadrant * i + j] = snowman;
-                }
-            }
-
-            _background.Initialize();
-
-            var viewport = _game.GraphicsDevice.Viewport;
-            _cameraOffset = new Vector2(viewport.Width / 2, viewport.Height / 2);
         }
 
         public void LoadContent(ContentManager content)
         {
-            _runner.LoadConent(content, "run_cycle");
-            _runner2.LoadConent(content, "run_cycle");
-
-            for (int i = 0; i < _snowmen.Length; i++)
-                _snowmen[i].LoadConent(content, "snow_assets");
-
-            _background.LoadConent(content, "background");
+            _particle = new Particle(content.Load<Texture2D>("whiteStar"));
         }
 
         public void Update(GameTime gameTime)
         {
-            _runner.IsRunning = false;
-
-            if (Joystick.Player1.IsUpPressing)
+            if (_joystick.IsDownPressing)
             {
-                _runner.IsRunning = true;
-                _runner.Velocity.Y -= 10;
-            }
-            else if (Joystick.Player1.IsDownPressing)
-            {
-                _runner.IsRunning = true;
-                _runner.Velocity.Y += 10;
+                _particle.Create(
+                    3000, new Vector2(400, 400), new Vector2(70, -100), new Vector2(0, 75), 1,
+                    0, 2, 0.99f,
+                    0.2f, 0.2f, -0.1f, 1,
+                    Color.White, Color.Gray, 1000
+                );
             }
 
-            if (Joystick.Player1.IsLeftPressing)
-            {
-                _runner.IsRunning = true;
-                _runner.Effects = SpriteEffects.FlipHorizontally;
-                _runner.Velocity.X -= 10;
-            }
-            else if (Joystick.Player1.IsRightPressing)
-            {
-                _runner.IsRunning = true;
-                _runner.Effects = SpriteEffects.None;
-                _runner.Velocity.X += 10;
-            }
-
-            _runner.Update(gameTime);
-            _runner2.Update(gameTime);
-
-            for (int i = 0; i < _snowmen.Length; i++)
-                _snowmen[i].Update(gameTime);
-
-            _cameraPosition = _runner.Position;
+            _particle.Update(gameTime);
         }
 
         public void Draw(SpriteBatch spriteBatch)
         {
-            var cameraPosition = _runner.Position;
-
             spriteBatch.Begin(SpriteSortMode.FrontToBack, BlendState.NonPremultiplied);
-
-            _background.Draw(spriteBatch, cameraPosition);
-            _runner.Draw(spriteBatch, cameraPosition);
-            _runner2.Draw(spriteBatch, cameraPosition);
-
-            for (int i = 0; i < _snowmen.Length; i++)
-                _snowmen[i].Draw(spriteBatch, cameraPosition);
-
+            _particle.Draw(spriteBatch);
             spriteBatch.End();
         }
     }
 
-    public class Runner : Sprite
+    public class Particle
     {
-        private readonly float MaxVelocity;
+        private int _age;
 
-        private int _currentCel;
-        private int _numberOfCels;
-        private float _msUntilNextCel;
-        private int _msPerCel;
+        private readonly Texture2D _texture;
+        private readonly Vector2 _origin;
 
-        public Vector2 Velocity;
+        private Vector2 _position;
+        private Vector2 _velocity;
+        private Vector2 _acceleration;
+        private float _dampening;
 
-        public bool IsRunning;
+        private float _rotation;
+        private float _rotationVelocity;
+        private float _rotationDampening;
+        private float _scale;
+        private float _scaleVelocity;
+        private float _scaleAcceleration;
+        private float _maxScale;
 
-        public Runner()
+        private Color _color;
+        private Color _initialColor;
+        private Color _finalColor;
+        private int _fadeAge;
+
+        public Particle(Texture2D texture)
         {
-            MaxVelocity = TestComponent.BufferWidth / 6;
+            _texture = texture;
+            _origin = texture.CalculateCenter();
         }
 
-        public override void Initialize()
+        public void Create(
+            int age, Vector2 position, Vector2 velocity, Vector2 acceleration, float dampening, // position
+            float rotation, float rotationVelocity, float rotationDampening, // rotation
+            float scale, float scaleVelocity, float scaleAcceleration, float maxScale, // scale
+            Color initialColor, Color finalColor, int fadeAge
+        )
         {
-            Initialize(new Rectangle(0, 0, 128, 128), new Vector2(57, 105));
-
-            _numberOfCels = 12;
-            _currentCel = 0;
-            _msPerCel = 50;
-            _msUntilNextCel = _msPerCel;
+            _age = age;
+            _position = position;
+            _velocity = velocity;
+            _acceleration = acceleration;
+            _dampening = dampening;
+            _rotation = rotation;
+            _rotationVelocity = rotationVelocity;
+            _rotationDampening = rotationDampening;
+            _scale = scale;
+            _scaleVelocity = scaleVelocity;
+            _scaleAcceleration = scaleAcceleration;
+            _maxScale = maxScale;
+            _color = initialColor;
+            _initialColor = initialColor;
+            _finalColor = finalColor;
+            _fadeAge = fadeAge;
         }
 
-        public override void Update(GameTime gameTime)
+        public void Update(GameTime gameTime)
         {
-            base.Update(gameTime);
-            UpdateAnimation(gameTime);
+            if (_age < 0)
+                return;
+
+            _age -= (int)gameTime.ElapsedGameTime.TotalMilliseconds;
             UpdatePosition(gameTime);
-        }
-
-        private void UpdateAnimation(GameTime gameTime)
-        {
-            _msUntilNextCel -= (float)gameTime.ElapsedGameTime.TotalMilliseconds;
-
-            if (IsRunning && _msUntilNextCel <= 0)
-            {
-                _currentCel++;
-                _msUntilNextCel = _msPerCel;
-            }
-
-            if (_currentCel >= _numberOfCels)
-                _currentCel = 0;
-
-            var location = Location.Value;
-            location.X = location.Width * _currentCel;
-            Location = location;
-        }
-
-        private void UpdatePosition(GameTime gameTime)
-        {
-            Velocity *= 0.95f;
-            Velocity.X = MathHelper.Clamp(Velocity.X, -MaxVelocity, MaxVelocity);
-            Velocity.Y = MathHelper.Clamp(Velocity.Y, -MaxVelocity, MaxVelocity);
-
-            var elapsedSeconds = (float)gameTime.ElapsedGameTime.TotalSeconds;
-            Position.X += Scale * Velocity.X * elapsedSeconds;
-            Position.Y += Scale * Velocity.Y * elapsedSeconds;
-            Position.Y = MathHelper.Clamp(Position.Y, TestComponent.Horizon, TestComponent.BufferHeight);
-        }
-    }
-
-    public class Snowman : Sprite
-    {
-        public override void Initialize()
-        {
-            Initialize(new Rectangle(0, 128, 256, 256), new Vector2(119, 185));
-        }
-    }
-
-    public class Background : Sprite
-    {
-        public override void Initialize()
-        {
-            Initialize(null, Vector2.Zero);
-        }
-    }
-
-    public abstract class Sprite
-    {
-        private Texture2D _texture;
-        protected Rectangle? Location;
-        protected Vector2 Origin;
-
-        public Vector2 Position;
-        public Color Color;
-        public float Rotation;
-        public float Scale;
-        public float Depth;
-        public SpriteEffects Effects;
-
-        public Sprite()
-        {
-            Color = Color.White;
-            Effects = SpriteEffects.None;
-        }
-
-        public abstract void Initialize();
-        protected void Initialize(Rectangle? location, Vector2 origin)
-        {
-            Rotation = 0;
-            Scale = 1;
-            Location = location;
-            Origin = origin;
-        }
-
-        public void LoadConent(ContentManager content, string fileName)
-        {
-            _texture = content.Load<Texture2D>(fileName);
-        }
-
-        public virtual void Update(GameTime gameTime)
-        {
-            UpdateDepth();
-            UpdateScale();
+            UpdateRotation(gameTime);
+            UpdateScale(gameTime);
             UpdateColor();
         }
 
-        public void Draw(SpriteBatch spriteBatch, Vector2 cameraPosition)
+        public void UpdatePosition(GameTime gameTime)
         {
-            var drawPosition = Position;
-            drawPosition.X -= cameraPosition.X;
-            drawPosition.X *= Scale;
-            drawPosition.X += TestComponent.BufferWidth / 2;
+            var elapsedSeconds = gameTime.ElapsedSeconds();
 
-            spriteBatch.Draw(
-                _texture,
-                drawPosition,
-                Location,
-                Color,
-                Rotation,
-                Origin,
-                Scale,
-                Effects,
-                Depth
-            );
+            _velocity *= _dampening;
+            _velocity += _acceleration * elapsedSeconds;
+            _position += _velocity * elapsedSeconds;
         }
 
-        private void UpdateDepth()
+        private void UpdateRotation(GameTime gameTime)
         {
-            Depth = (Position.Y - TestComponent.Horizon) / (720 - TestComponent.Horizon);
+            _rotation *= _rotationDampening;
+            _rotation += _rotationVelocity * gameTime.ElapsedSeconds();
         }
 
-        private void UpdateScale()
+        private void UpdateScale(GameTime gameTime)
         {
-            Scale = 0.25f + (Depth * 0.75f);
+            var elapsedSeconds = gameTime.ElapsedSeconds();
+            _scaleVelocity += _scaleAcceleration * elapsedSeconds;
+            _scale += _scaleVelocity * elapsedSeconds;
+            _scale = MathHelper.Clamp(_scale, 0, _maxScale);
         }
 
         private void UpdateColor()
         {
-            var greyValue = 0.75f + (Depth * 0.25f);
-            Color = new Color(greyValue, greyValue, greyValue);
+            if (_age < 0 || _age > _fadeAge)
+                return;
+
+            var amount = (float)_age / _fadeAge;
+
+            _color.R = (byte)MathHelper.Lerp(_finalColor.R, _initialColor.R, amount);
+            _color.G = (byte)MathHelper.Lerp(_finalColor.G, _initialColor.G, amount);
+            _color.B = (byte)MathHelper.Lerp(_finalColor.B, _initialColor.B, amount);
+            _color.A = (byte)MathHelper.Lerp(_finalColor.A, _initialColor.A, amount);
+        }
+
+        public void Draw(SpriteBatch spriteBatch)
+        {
+            if (_age < 0)
+                return;
+
+            spriteBatch.Draw(_texture, _position, null, _color, _rotation, _origin, _scale, SpriteEffects.None, 1);
         }
     }
 }

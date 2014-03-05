@@ -11,6 +11,11 @@ namespace Resources
             return (float)gameTime.ElapsedGameTime.TotalSeconds * value;
         }
 
+        public static float ElapsedSeconds(this GameTime gameTime)
+        {
+            return (float)gameTime.ElapsedGameTime.TotalSeconds;
+        }
+
         public static Vector2 CalculateCenterOfScreen(this Viewport viewport)
         {
             return new Vector2(viewport.Width / 2f, viewport.Height / 2f);
