@@ -17,7 +17,9 @@ namespace Core
         private readonly Keys _fire2;
 
         public bool IsLeftPressing { get; private set; }
+        public bool IsLeftPressed { get; private set; }
         public bool IsRightPressing { get; private set; }
+        public bool IsRightPressed { get; private set; }
         public bool IsDownPressing { get; private set; }
         public bool IsUpPressing { get; private set; }
         public bool IsJumpPressing { get; private set; }
@@ -40,7 +42,9 @@ namespace Core
         public void Update()
         {
             IsLeftPressing = false;
+            IsLeftPressed = false;
             IsRightPressing = false;
+            IsRightPressed = false;
             IsUpPressing = false;
             IsDownPressing = false;
 
@@ -55,6 +59,11 @@ namespace Core
                 IsUpPressing = true;
             else if (state.IsKeyDown(_down))
                 IsDownPressing = true;
+
+            if (state.IsKeyUp(_left) && _lastState.IsKeyDown(_left))
+                IsLeftPressed = true;
+            else if (state.IsKeyUp(_right) && _lastState.IsKeyDown(_right))
+                IsRightPressed = true;
 
             IsJumpPressing = state.IsKeyDown(_jump);
             IsFirePressed = state.IsKeyUp(_fire) && _lastState.IsKeyDown(_fire);

@@ -1,11 +1,13 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Resources;
 
 // ReSharper disable once CheckNamespace
+// ReSharper disable ForCanBeConvertedToForeach
 namespace Core
 {
     public class TestComponent
@@ -13,71 +15,122 @@ namespace Core
         private readonly MainGame _game;
         private readonly Joystick _joystick;
         private Effect _effect;
+        private readonly EffectType[] _effectTypes;
+        private Vector2 _effectNamePosition;
+        private string _effectName;
+        private int _currentEffectType;
+        private SpriteFont _segoe;
 
         public TestComponent(MainGame game)
         {
             _game = game;
+            _game.BackgroundColor = Color.Black;
+
+            _effectTypes = Enum.GetValues(typeof(EffectType)).Cast<EffectType>().ToArray();
             _joystick = Joystick.Player1;
-            _effect = new Effect(new Vector2(200, 200), 1);
         }
 
         public void Initialize()
         {
+            _effect = new Effect(_game.GraphicsDevice.Viewport.CalculateCenterOfScreen());
+            _effectNamePosition = new Vector2(50, 50);
         }
 
         public void LoadContent(ContentManager content)
         {
             _effect.LoadContent(content);
+            _segoe = content.Load<SpriteFont>("Segoe");
+            _effectName = _effectTypes[_currentEffectType].ToString();
         }
 
         public void Update(GameTime gameTime)
         {
+            if (_joystick.IsLeftPressed)
+            {
+                _currentEffectType--;
+
+                if (_currentEffectType < 0)
+                    _currentEffectType = _effectTypes.Length - 1;
+
+                _effectName = _effectTypes[_currentEffectType].ToString();
+
+                _effect.Invalidate();
+            }
+            else if (_joystick.IsRightPressed)
+            {
+                _currentEffectType++;
+
+                if (_currentEffectType == _effectTypes.Length)
+                    _currentEffectType = 0;
+
+                _effectName = _effectTypes[_currentEffectType].ToString();
+
+                _effect.Invalidate();
+            }
+
             if (_joystick.IsFirePressed)
-                _effect.Create();
+            {
+                _effect.Create(_effectTypes[_currentEffectType]);
+            }
+            else if (_joystick.IsFire2Pressed)
+            {
+                _effect.Invalidate();
+            }
 
             _effect.Update(gameTime);
         }
 
         public void Draw(SpriteBatch spriteBatch)
         {
-            spriteBatch.Begin(SpriteSortMode.FrontToBack, BlendState.NonPremultiplied);
-            _effect.Draw(spriteBatch);
+            spriteBatch.Begin();
+            spriteBatch.DrawString(_segoe, _effectName, _effectNamePosition, Color.White);
             spriteBatch.End();
+
+            _effect.Draw(spriteBatch);
         }
+    }
+
+    public enum EffectType
+    {
+        Spiral,
+        Fire,
+        FireWall,
+        MovingFlame,
+        Smoke
     }
 
     public class Effect
     {
-        private Texture2D _texture;
+        private Texture2D _starTexture;
+        private Texture2D _circleTexture;
+        private Texture2D _snowFlakeTexture;
 
         private readonly Vector2 _origin;
-        private float _originRadius;
+        private int _radius;
 
         private int _duration;
-        private int _newParticleAmmount;
+        private int _newParticleAmount;
         private int _burstFrequency;
         private int _burstCountdown;
 
         private readonly List<Particle> _particles;
+        private EffectType _effectType;
+        private BlendState _blendState;
 
-        public Effect(Vector2 origin, float originRadius)
+        private readonly Random _random;
+
+        public Effect(Vector2 origin)
         {
             _origin = origin;
-            _originRadius = originRadius;
             _particles = new List<Particle>();
-        }
-
-        public void Create()
-        {
-            _duration = 10000;
-            _newParticleAmmount = 1;
-            _burstFrequency = 16;
-            _burstCountdown = _burstFrequency;
+            _random = new Random();
         }
 
         public void LoadContent(ContentManager content)
         {
-            _texture = content.Load<Texture2D>("whiteStar");
+            _starTexture = content.Load<Texture2D>("whiteStar");
+            _circleTexture = content.Load<Texture2D>("whiteCircle");
+            _snowFlakeTexture = content.Load<Texture2D>("snowFlake");
         }
 
         public void Update(GameTime gameTime)
@@ -89,7 +142,7 @@ namespace Core
 
             if (_burstCountdown <= 0 && _duration >= 0)
             {
-                for (var i = 0; i < _newParticleAmmount; ++i)
+                for (var i = 0; i < _newParticleAmount; ++i)
                     CreateParticle();
 
                 _burstCountdown = _burstFrequency;
@@ -106,34 +159,256 @@ namespace Core
 
         public void Draw(SpriteBatch spriteBatch)
         {
+            spriteBatch.Begin(SpriteSortMode.FrontToBack, _blendState);
             for (var i = 0; i < _particles.Count; ++i)
                 _particles[i].Draw(spriteBatch);
+            spriteBatch.End();
+        }
+
+        public void Invalidate()
+        {
+            _duration = 0;
+        }
+
+        public void Create(EffectType effectType)
+        {
+            _effectType = effectType;
+            switch (effectType)
+            {
+                case EffectType.Spiral: CreateSpiral(); break;
+                case EffectType.Fire: CreateFire(); break;
+                case EffectType.FireWall: CreateFireWall(); break;
+                case EffectType.MovingFlame: CreateMovingFlame(); break;
+                case EffectType.Smoke: CreateSmoke(); break;
+                default: throw new ArgumentOutOfRangeException("effectType");
+            }
+        }
+        private void CreateSpiral()
+        {
+            _duration = 10000;
+            _newParticleAmount = 1;
+            _burstFrequency = 16;
+            _burstCountdown = _burstFrequency;
+            _blendState = BlendState.NonPremultiplied;
+        }
+        private void CreateFire()
+        {
+            _duration = 60000;
+            _newParticleAmount = 10;
+            _burstFrequency = 16;
+            _burstCountdown = _burstFrequency;
+
+            _radius = 50;
+            _blendState = BlendState.Additive;
+        }
+        private void CreateFireWall()
+        {
+            _duration = 60000;
+            _newParticleAmount = 50;
+            _burstFrequency = 16;
+            _burstCountdown = _burstFrequency;
+
+            _radius = 50;
+            _blendState = BlendState.Additive;
+        }
+        private void CreateMovingFlame()
+        {
+            _duration = 60000;
+            _newParticleAmount = 15;
+            _burstFrequency = 16;
+            _burstCountdown = _burstFrequency;
+
+            _radius = 15;
+            _blendState = BlendState.Additive;
+        }
+        private void CreateSmoke()
+        {
+            _duration = 60000;
+            _newParticleAmount = 4;
+            _burstFrequency = 16;
+            _burstCountdown = _burstFrequency;
+
+            _radius = 50;
+            _blendState = BlendState.Additive;
         }
 
         private void CreateParticle()
         {
+            switch (_effectType)
+            {
+                case EffectType.Spiral: CreateSpiralParticle(); break;
+                case EffectType.Fire: CreateFireParticle(); break;
+                case EffectType.FireWall: CreateFireWallParticle(); break;
+                case EffectType.MovingFlame: CreateMovingFlameParticle(); break;
+                case EffectType.Smoke: CreateSmokeParticle(); break;
+                default: throw new ArgumentOutOfRangeException();
+            }
+        }
+        private void CreateSpiralParticle()
+        {
             const int age = 3000;
 
-            var position = _origin;
-            var velocity = new Vector2((float)(100 * Math.Cos(_duration)), (float)(100 * Math.Sin(_duration)));
+            var velocity = new Vector2((float)(100.0f * Math.Cos(_duration)), (float)(100.0f * Math.Sin(_duration)));
             var acceleration = new Vector2(0, 75);
-            const float dampening = 0.75f;
+            const float dampening = 1f;
 
-            const int rotation = 0;
-            const float rotationVelocity = 2f;
+            const float rotation = 0.0f;
+            const float rotationVelocity = 2.0f;
             const float rotationDampening = 0.99f;
 
             const float scale = 0.2f;
             const float scaleVelocity = 0.2f;
             const float scaleAcceleration = -0.1f;
-            const float maxScale = 1f;
+            const float maxScale = 1.0f;
 
-            var initColor = Color.White;
-            var finalColor = Color.White;
+            var initialColor = Color.DarkRed;
+            var finalColor = Color.DarkRed;
+            finalColor *= 0;
+
+            AddNewParticle(_starTexture, age, _origin, velocity, acceleration, dampening, rotation, rotationVelocity, rotationDampening,
+                scale, scaleVelocity, scaleAcceleration, maxScale, initialColor, finalColor, age);
+        }
+        private void CreateFireParticle()
+        {
+            const int age = 3000;
+            const int fadeAge = 2750;
+
+            var offset = new Vector2(
+                (float)(_random.Next(_radius) * Math.Cos(_random.Next(360))),
+                (float)(_random.Next(_radius) * Math.Sin(_random.Next(360)))
+            );
+            var position = _origin + offset;
+            var velocity = new Vector2(-(offset.X * 0.5f), 0);
+            var acceleration = new Vector2(0, -_random.Next(200));
+
+
+            const float dampening = 0.96f;
+
+            const float rotation = 0;
+            const float rotationVelocity = 0;
+            const float rotationDampening = 1;
+
+            const float scale = 0.5f;
+            const float scaleVelocity = -0.1f;
+            const float scaleAcceleration = 0;
+            const float maxScale = 1;
+
+            var initialColor = Color.Red;
+            var finalColor = Color.Yellow;
             finalColor.A = 0;
 
-            var particle = new Particle(_texture);
-            particle.Create(age, position, velocity, acceleration, dampening, rotation, rotationVelocity, rotationDampening, scale, scaleVelocity, scaleAcceleration, maxScale, initColor, finalColor, age);
+            AddNewParticle(_circleTexture, age, position, velocity, acceleration, dampening, rotation, rotationVelocity, rotationDampening,
+                scale, scaleVelocity, scaleAcceleration, maxScale, initialColor, finalColor, fadeAge);
+        }
+        private void CreateFireWallParticle()
+        {
+            const int age = 3000;
+            const int fadeAge = 2750;
+
+            var offset = new Vector2(
+                (float)(_random.Next(_radius) * Math.Cos(_random.Next(360))),
+                (float)(_random.Next(_radius) * Math.Sin(_random.Next(360)))
+            );
+            var offset2 = new Vector2((float)(400 * Math.Cos(_duration)), 0);
+            var position = _origin + offset + offset2;
+            var velocity = new Vector2(-(offset.X * 0.5f), 0);
+            var acceleration = new Vector2(0, -_random.Next(200));
+
+
+            const float dampening = 0.96f;
+
+            const float rotation = 0;
+            const float rotationVelocity = 0;
+            const float rotationDampening = 1;
+
+            const float scale = 0.5f;
+            const float scaleVelocity = -0.1f;
+            const float scaleAcceleration = 0;
+            const float maxScale = 1;
+
+            var initialColor = Color.Red;
+            var finalColor = Color.Yellow;
+            finalColor.A = 0;
+
+            AddNewParticle(_circleTexture, age, position, velocity, acceleration, dampening, rotation, rotationVelocity, rotationDampening,
+                scale, scaleVelocity, scaleAcceleration, maxScale, initialColor, finalColor, fadeAge);
+        }
+        private void CreateMovingFlameParticle()
+        {
+            var age = 500 + _random.Next(500);
+            var fadeAge = age - _random.Next(100);
+
+            var offset = new Vector2(
+                (float)(_random.Next(_radius) * Math.Cos(_random.Next(360))),
+                (float)(_random.Next(_radius) * Math.Sin(_random.Next(360)))
+            );
+            offset.X += (float)(200 * Math.Cos(_duration / 500f));
+
+            var position = _origin + offset;
+            var velocity = new Vector2(-(offset.X * 0.5f), -500);
+            var acceleration = new Vector2(0, -_random.Next(300));
+
+            const float dampening = 0.96f;
+
+            const float rotation = 0;
+            const float rotationVelocity = 2;
+            const float rotationDampening = 0.99f;
+
+            const float scale = 0.5f;
+            const float scaleVelocity = -0.1f;
+            const float scaleAcceleration = 0;
+            const float maxScale = 1;
+
+            var initialColor = Color.DarkBlue;
+            var finalColor = Color.DarkOrange;
+            finalColor.A = 0;
+
+            AddNewParticle(_circleTexture, age, position, velocity, acceleration, dampening, rotation, rotationVelocity, rotationDampening,
+                scale, scaleVelocity, scaleAcceleration, maxScale, initialColor, finalColor, fadeAge);
+        }
+        private void CreateSmokeParticle()
+        {
+            var age = 5000 + _random.Next(5000);
+            var fadeAge = age - _random.Next(100);
+
+            var offset = new Vector2(
+                (float)(_random.Next(_radius) * Math.Cos(_random.Next(360))),
+                (float)(_random.Next(_radius) * Math.Sin(_random.Next(360)))
+            );
+            var offset2 = new Vector2((float)(400 * Math.Cos(_duration / 500f)), 0);
+            var position = _origin + offset + offset2;
+            var velocity = new Vector2(0, -30 - _random.Next(30));
+            var acceleration = new Vector2(10 + _random.Next(10), 0);
+
+            const float dampening = 1f;
+
+            const float rotation = 0;
+            const float rotationVelocity = 0;
+            const float rotationDampening = 1;
+
+            const float scale = 0.6f;
+            var scaleVelocity = _random.Next(10) / 50f;
+            const float scaleAcceleration = 0;
+            const float maxScale = 3;
+
+            var initialColor = Color.Black;
+            initialColor.A = 128;
+            var finalColor = new Color(32, 32, 32, 0);
+
+            AddNewParticle(_circleTexture, age, position, velocity, acceleration, dampening, rotation, rotationVelocity, rotationDampening,
+                scale, scaleVelocity, scaleAcceleration, maxScale, initialColor, finalColor, fadeAge);
+        }
+
+        private void AddNewParticle(
+            Texture2D texture,
+            int age, Vector2 position, Vector2 velocity, Vector2 acceleration, float dampening,
+            float rotation, float rotationVelocity, float rotationDampening,
+            float scale, float scaleVelocity, float scaleAcceleration, float maxScale,
+            Color initialColor, Color finalColor, int fadeAge)
+        {
+            var particle = new Particle(texture);
+            particle.Create(age, position, velocity, acceleration, dampening, rotation, rotationVelocity, rotationDampening,
+                scale, scaleVelocity, scaleAcceleration, maxScale, initialColor, finalColor, fadeAge);
             _particles.Add(particle);
         }
     }
