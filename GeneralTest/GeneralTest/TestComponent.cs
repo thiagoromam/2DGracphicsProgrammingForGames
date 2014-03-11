@@ -20,6 +20,7 @@ namespace Core
         private string _effectName;
         private int _currentEffectType;
         private SpriteFont _segoe;
+        public static float ScreenHeight;
 
         public TestComponent(MainGame game)
         {
@@ -32,7 +33,9 @@ namespace Core
 
         public void Initialize()
         {
-            _effect = new Effect(_game.GraphicsDevice.Viewport.CalculateCenterOfScreen());
+            var viewport = _game.GraphicsDevice.Viewport;
+            ScreenHeight = viewport.Height;
+            _effect = new Effect(viewport.CalculateCenterOfScreen());
             _effectNamePosition = new Vector2(50, 50);
         }
 
@@ -96,7 +99,8 @@ namespace Core
         Fire,
         FireWall,
         MovingFlame,
-        Smoke
+        Smoke,
+        Explosion
     }
 
     public class Effect
@@ -180,6 +184,7 @@ namespace Core
                 case EffectType.FireWall: CreateFireWall(); break;
                 case EffectType.MovingFlame: CreateMovingFlame(); break;
                 case EffectType.Smoke: CreateSmoke(); break;
+                case EffectType.Explosion: CreateExplosion(); break;
                 default: throw new ArgumentOutOfRangeException("effectType");
             }
         }
@@ -231,6 +236,16 @@ namespace Core
             _radius = 50;
             _blendState = BlendState.Additive;
         }
+        private void CreateExplosion()
+        {
+            _duration = 16;
+            _newParticleAmount = 800;
+            _burstFrequency = 16;
+            _burstCountdown = _burstFrequency;
+
+            _radius = 20;
+            _blendState = BlendState.NonPremultiplied;
+        }
 
         private void CreateParticle()
         {
@@ -241,6 +256,7 @@ namespace Core
                 case EffectType.FireWall: CreateFireWallParticle(); break;
                 case EffectType.MovingFlame: CreateMovingFlameParticle(); break;
                 case EffectType.Smoke: CreateSmokeParticle(); break;
+                case EffectType.Explosion: CreateExplosionParticle(); break;
                 default: throw new ArgumentOutOfRangeException();
             }
         }
@@ -398,6 +414,38 @@ namespace Core
             AddNewParticle(_circleTexture, age, position, velocity, acceleration, dampening, rotation, rotationVelocity, rotationDampening,
                 scale, scaleVelocity, scaleAcceleration, maxScale, initialColor, finalColor, fadeAge);
         }
+        private void CreateExplosionParticle()
+        {
+            var age = 3000 + _random.Next(5000);
+            var fadeAge = age / 2;
+
+            var position = new Vector2(200, TestComponent.ScreenHeight);
+            
+            var offset = new Vector2(
+                (float)(_random.Next(_radius) * Math.Cos(_random.Next(360))),
+                (float)(_random.Next(_radius) * Math.Sin(_random.Next(360)))
+            );
+            position += offset;
+            var velocity = new Vector2(_random.Next(500) + offset.X * 30, -60 * Math.Abs(offset.Y));
+            var acceleration = new Vector2(0, 400);
+
+            const float dampening = 1.0f;
+
+            const float rotation = 0.0f;
+            var rotationVelocity = velocity.X / 50.0f;
+            const float rotationDampening = 0.97f;
+
+            var scale = 0.1f + _random.Next(10) / 50.0f;
+            var scaleVelocity = (_random.Next(10) - 5) / 50.0f;
+            const float scaleAcceleration = 0.0f;
+            const float maxScale = 1.0f;
+
+            var initialColor = new Color((byte)(_random.Next(128) + 128), 0, 0);
+            var finalColor = Color.Black;
+
+            AddNewParticle(_starTexture, age, position, velocity, acceleration, dampening, rotation, rotationVelocity, rotationDampening,
+                scale, scaleVelocity, scaleAcceleration, maxScale, initialColor, finalColor, fadeAge);
+        }
 
         private void AddNewParticle(
             Texture2D texture,
@@ -474,7 +522,8 @@ namespace Core
             if (Age < 0)
                 return;
 
-            Age -= (int)gameTime.ElapsedGameTime.TotalMilliseconds;
+            Age -= gameTime.ElapsedGameTime.Milliseconds;
+
             UpdatePosition(gameTime);
             UpdateRotation(gameTime);
             UpdateScale(gameTime);
@@ -488,6 +537,12 @@ namespace Core
             _velocity *= _dampening;
             _velocity += _acceleration * elapsedSeconds;
             _position += _velocity * elapsedSeconds;
+
+            if (_position.Y >= TestComponent.ScreenHeight)
+            {
+                _position.Y = TestComponent.ScreenHeight;
+                _velocity.X = 0;
+            }
         }
 
         private void UpdateRotation(GameTime gameTime)
