@@ -100,7 +100,8 @@ namespace Core
         FireWall,
         MovingFlame,
         Smoke,
-        Explosion
+        Explosion,
+        Snow
     }
 
     public class Effect
@@ -174,6 +175,11 @@ namespace Core
             _duration = 0;
         }
 
+        public bool IsAlive()
+        {
+            return _duration > 0 || _particles.Count > 0;
+        }
+
         public void Create(EffectType effectType)
         {
             _effectType = effectType;
@@ -185,6 +191,7 @@ namespace Core
                 case EffectType.MovingFlame: CreateMovingFlame(); break;
                 case EffectType.Smoke: CreateSmoke(); break;
                 case EffectType.Explosion: CreateExplosion(); break;
+                case EffectType.Snow: CreateSnow(); break;
                 default: throw new ArgumentOutOfRangeException("effectType");
             }
         }
@@ -246,6 +253,16 @@ namespace Core
             _radius = 20;
             _blendState = BlendState.NonPremultiplied;
         }
+        private void CreateSnow()
+        {
+            _duration = 60000;
+            _newParticleAmount = 1;
+            _burstFrequency = 64;
+            _burstCountdown = _burstFrequency;
+
+            _radius = 50;
+            _blendState = BlendState.NonPremultiplied;
+        }
 
         private void CreateParticle()
         {
@@ -257,6 +274,7 @@ namespace Core
                 case EffectType.MovingFlame: CreateMovingFlameParticle(); break;
                 case EffectType.Smoke: CreateSmokeParticle(); break;
                 case EffectType.Explosion: CreateExplosionParticle(); break;
+                case EffectType.Snow: CreateSnowParticle(); break;
                 default: throw new ArgumentOutOfRangeException();
             }
         }
@@ -420,7 +438,7 @@ namespace Core
             var fadeAge = age / 2;
 
             var position = new Vector2(200, TestComponent.ScreenHeight);
-            
+
             var offset = new Vector2(
                 (float)(_random.Next(_radius) * Math.Cos(_random.Next(360))),
                 (float)(_random.Next(_radius) * Math.Sin(_random.Next(360)))
@@ -445,6 +463,38 @@ namespace Core
 
             AddNewParticle(_starTexture, age, position, velocity, acceleration, dampening, rotation, rotationVelocity, rotationDampening,
                 scale, scaleVelocity, scaleAcceleration, maxScale, initialColor, finalColor, fadeAge);
+        }
+        private void CreateSnowParticle()
+        {
+            var scale = 0.1f + _random.Next(10) / 20f;
+            const float scaleVelocity = 0;
+            const float scaleAcceleration = 0;
+            const float maxScale = 1;
+
+            var age = (int)(10000 / scale);
+
+            var offset = new Vector2(
+                (float)(_random.Next(_radius) * Math.Cos(_random.Next(360))),
+                (float)(_random.Next(_radius) * Math.Sin(_random.Next(360)))
+            );
+            var offset2 = new Vector2((float) (_origin.X * Math.Cos(_duration / 500f)) ,0);
+            var position = new Vector2(_origin.X, -50) + offset + offset2;
+
+            var velocity = new Vector2(_random.Next(10) - 5, 100 * scale);
+
+            const float dampening = 1;
+
+            const float rotation = 0;
+            var rotationVelocity = velocity.X / 5;
+            const float rotationDampening = 1;
+
+            var initialColor = Color.White;
+            var finalColor = Color.White;
+            finalColor.A = 0;
+
+
+            AddNewParticle(_snowFlakeTexture, age, position, velocity, Vector2.Zero, dampening, rotation, rotationVelocity, rotationDampening,
+                scale, scaleVelocity, scaleAcceleration, maxScale, initialColor, finalColor, age);
         }
 
         private void AddNewParticle(
