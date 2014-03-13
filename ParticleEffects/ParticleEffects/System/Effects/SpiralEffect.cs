@@ -38,16 +38,13 @@ namespace ParticleEffects.System.Effects
             var velocity = new Vector2((float)(100.0f * Math.Cos(Duration)), (float)(100.0f * Math.Sin(Duration)));
             var acceleration = new Vector2(0, 75);
 
-            var finalColor = Color.DarkRed;
-            finalColor *= 0;
-
             particle.Initialize(
                 _texture, _origin,
                 3000,
                 Position, velocity, acceleration, 1,
                 0, 2, 0.99f,
                 0.2f, 0.2f, -0.1f, 1,
-                Color.DarkRed, finalColor, 3000
+                Color.DarkRed, new Color(), 3000
             );
 
             return particle;

@@ -11,14 +11,20 @@ namespace Core
     public class TestComponent
     {
 		private readonly MainGame _game;
-        private readonly EffectGenerator _effect;
         private readonly Joystick _joystick;
         private Vector2 _center;
+        private readonly EffectManager _effectManager;
+        private readonly IEffectInitializer _spiralEffect;
+        private readonly IEffectInitializer _fireEffect;
 
         public TestComponent(MainGame game)
 		{
 			_game = game;
-		    _effect = new EffectGenerator(new SpiralEffect());
+            _game.BackgroundColor = Color.Black;
+            
+            _effectManager = new EffectManager();
+            _spiralEffect = _effectManager.Add(new SpiralEffect());
+            _fireEffect = _effectManager.Add(new FireEffect());
             _joystick = Joystick.Player1;
 		}
 	
@@ -29,23 +35,28 @@ namespace Core
 		
         public void LoadContent(ContentManager content)
 		{
-            _effect.LoadContent(content);
+            _effectManager.LoadContent(content);
 		}
 		
         public void Update(GameTime gameTime)
 		{
             if (_joystick.IsFirePressed)
             {
-                _effect.Initialize();
-                _effect.Position = _center;
+                _spiralEffect.Position = _center;
+                _spiralEffect.Initialize();
+            }
+            else if (_joystick.IsFire2Pressed)
+            {
+                _fireEffect.Position = _center;
+                _fireEffect.Initialize();
             }
 
-            _effect.Update(gameTime);
+            _effectManager.Update(gameTime);
 		}
 		
         public void Draw(SpriteBatch spriteBatch)
 		{
-            _effect.Draw(spriteBatch);
+            _effectManager.Draw(spriteBatch);
 		}
     }
 }

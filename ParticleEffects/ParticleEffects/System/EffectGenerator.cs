@@ -5,7 +5,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace ParticleEffects.System
 {
-    public class EffectGenerator
+    public class EffectGenerator : IEffectInitializer
     {
         private readonly IEffect _effect;
         private readonly List<Particle> _particles;
