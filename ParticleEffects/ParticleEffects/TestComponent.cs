@@ -14,8 +14,7 @@ namespace Core
         private readonly Joystick _joystick;
         private Vector2 _center;
         private readonly EffectManager _effectManager;
-        private readonly IEffectInitializer _spiralEffect;
-        private readonly IEffectInitializer _fireEffect;
+        private readonly IEffectInitializer _effect;
 
         public TestComponent(MainGame game)
 		{
@@ -23,8 +22,7 @@ namespace Core
             _game.BackgroundColor = Color.Black;
             
             _effectManager = new EffectManager();
-            _spiralEffect = _effectManager.Add(new SpiralEffect());
-            _fireEffect = _effectManager.Add(new FireEffect());
+            _effect = _effectManager.Add(new SnowEffect());
             _joystick = Joystick.Player1;
 		}
 	
@@ -42,13 +40,8 @@ namespace Core
 		{
             if (_joystick.IsFirePressed)
             {
-                _spiralEffect.Position = _center;
-                _spiralEffect.Initialize();
-            }
-            else if (_joystick.IsFire2Pressed)
-            {
-                _fireEffect.Position = _center;
-                _fireEffect.Initialize();
+                _effect.Position = new Vector2(_center.X, -50);
+                _effect.Initialize();
             }
 
             _effectManager.Update(gameTime);

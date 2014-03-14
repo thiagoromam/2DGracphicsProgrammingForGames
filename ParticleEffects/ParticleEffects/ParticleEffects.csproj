@@ -140,7 +140,12 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="System\EffectGenerator.cs" />
     <Compile Include="System\EffectManager.cs" />
+    <Compile Include="System\Effects\ExplosionEffect.cs" />
     <Compile Include="System\Effects\FireEffect.cs" />
+    <Compile Include="System\Effects\FirewallEffect.cs" />
+    <Compile Include="System\Effects\MovingFlameEffect.cs" />
+    <Compile Include="System\Effects\SmokeEffect.cs" />
+    <Compile Include="System\Effects\SnowEffect.cs" />
     <Compile Include="System\Effects\SpiralEffect.cs" />
     <Compile Include="System\IEffect.cs" />
     <Compile Include="System\IEffectInitializer.cs" />

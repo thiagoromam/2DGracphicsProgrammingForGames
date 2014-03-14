@@ -38,9 +38,6 @@ namespace ParticleEffects.System
 
         public void Update(GameTime gameTime)
         {
-            if (_effect.Duration > 0)
-                _effect.Duration -= gameTime.ElapsedGameTime.Milliseconds;
-
             if (_effect.BurstCountdown > 0)
                 _effect.BurstCountdown -= gameTime.ElapsedGameTime.Milliseconds;
 
@@ -51,6 +48,9 @@ namespace ParticleEffects.System
 
                 _effect.BurstCountdown = _effect.BurstFrequency;
             }
+
+            if (_effect.Duration > 0)
+                _effect.Duration -= gameTime.ElapsedGameTime.Milliseconds;
 
             for (var i = _particles.Count - 1; i >= 0; --i)
             {
