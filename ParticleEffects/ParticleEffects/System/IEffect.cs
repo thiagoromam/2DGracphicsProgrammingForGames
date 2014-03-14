@@ -14,6 +14,6 @@ namespace ParticleEffects.System
         Vector2 Position { set; }
 
         void LoadContent(ContentManager content);
-        Particle CreateParticle();
+        void InitializeParticle(Particle particle);
     }
 }

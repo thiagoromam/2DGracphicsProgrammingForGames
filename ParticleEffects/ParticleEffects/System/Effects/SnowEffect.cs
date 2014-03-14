@@ -8,8 +8,9 @@ namespace ParticleEffects.System.Effects
 {
     public class SnowEffect : IEffect
     {
-        private readonly int _radius;
         private readonly Random _random;
+        private readonly int _radius;
+        private readonly Color _finalColor;
         private Texture2D _texture;
         private Vector2 _origin;
 
@@ -26,9 +27,11 @@ namespace ParticleEffects.System.Effects
             NewParticleAmount = 1;
             BurstFrequency = 64;
             BlendState = BlendState.NonPremultiplied;
-            
-            _radius = 50;
+
             _random = new Random();
+            _radius = 50;
+            _finalColor = Color.White;
+            _finalColor.A = 0;
         }
 
         public void LoadContent(ContentManager content)
@@ -37,7 +40,7 @@ namespace ParticleEffects.System.Effects
             _origin = _texture.CalculateCenter();
         }
 
-        public Particle CreateParticle()
+        public void InitializeParticle(Particle particle)
         {
             var scale = 0.1f + _random.Next(10) / 20f;
 
@@ -53,20 +56,14 @@ namespace ParticleEffects.System.Effects
 
             var rotationVelocity = velocity.X / 5;
 
-            var finalColor = Color.White;
-            finalColor.A = 0;
-
-            var particle = new Particle();
             particle.Initialize(
                 _texture, _origin,
                 age,
                 position, velocity, Vector2.Zero, 1,
                 0, rotationVelocity, 1,
                 scale, 0, 0, 1,
-                Color.White, finalColor, age
+                Color.White, _finalColor, age
             );
-
-            return particle;
         }
     }
 }

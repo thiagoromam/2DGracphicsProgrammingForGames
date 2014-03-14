@@ -22,7 +22,7 @@ namespace Core
             _game.BackgroundColor = Color.Black;
             
             _effectManager = new EffectManager();
-            _effect = _effectManager.Add(new SnowEffect());
+            _effect = _effectManager.Add(new FireEffect());
             _joystick = Joystick.Player1;
 		}
 	
@@ -39,10 +39,7 @@ namespace Core
         public void Update(GameTime gameTime)
 		{
             if (_joystick.IsFirePressed)
-            {
-                _effect.Position = new Vector2(_center.X, -50);
-                _effect.Initialize();
-            }
+                _effect.Start(_center);
 
             _effectManager.Update(gameTime);
 		}

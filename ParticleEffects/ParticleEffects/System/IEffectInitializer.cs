@@ -4,7 +4,6 @@ namespace ParticleEffects.System
 {
     public interface IEffectInitializer
     {
-        Vector2 Position { set; }
-        void Initialize();
+        void Start(Vector2 position);
     }
 }

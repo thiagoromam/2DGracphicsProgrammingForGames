@@ -8,10 +8,11 @@ namespace ParticleEffects.System.Effects
 {
     public class MovingFlameEffect : IEffect
     {
+        private readonly Random _random;
         private readonly int _radius;
+        private readonly Color _finalColor;
         private Texture2D _texture;
         private Vector2 _origin;
-        private readonly Random _random;
 
         public int Duration { get; set; }
         public int BurstFrequency { get; private set; }
@@ -27,8 +28,10 @@ namespace ParticleEffects.System.Effects
             BurstFrequency = 16;
             BlendState = BlendState.Additive;
 
-            _radius = 15;
             _random = new Random();
+            _radius = 15;
+            _finalColor = Color.DarkOrange;
+            _finalColor.A = 0;
         }
 
         public void LoadContent(ContentManager content)
@@ -37,7 +40,7 @@ namespace ParticleEffects.System.Effects
             _origin = _texture.CalculateCenter();
         }
 
-        public Particle CreateParticle()
+        public void InitializeParticle(Particle particle)
         {
             var age = 500 + _random.Next(500);
             var fadeAge = age - _random.Next(100);
@@ -52,19 +55,13 @@ namespace ParticleEffects.System.Effects
             var velocity = new Vector2(-(offset.X * 0.5f), -500);
             var acceleration = new Vector2(0, -_random.Next(300));
 
-            var finalColor = Color.DarkOrange;
-            finalColor.A = 0;
-
-            var particle = new Particle();
             particle.Initialize(
                 _texture, _origin,
                 age, position, velocity, acceleration, 0.96f,
                 0, 2, 0.99f,
                 0.5f, -0.1f, 0, 1,
-                Color.DarkBlue, finalColor, fadeAge
+                Color.DarkBlue, _finalColor, fadeAge
             );
-
-            return particle;
         }
     }
 }

@@ -8,9 +8,10 @@ namespace ParticleEffects.System.Effects
 {
     public class FirewallEffect : IEffect
     {
-        private readonly int _radius;
-        private Texture2D _texture;
         private readonly Random _random;
+        private readonly int _radius;
+        private readonly Color _finalColor;
+        private Texture2D _texture;
         private Vector2 _origin;
 
         public int Duration { get; set; }
@@ -27,8 +28,10 @@ namespace ParticleEffects.System.Effects
             BurstFrequency = 16;
             BlendState = BlendState.Additive;
 
-            _radius = 50;
             _random = new Random();
+            _radius = 50;
+            _finalColor = Color.Yellow;
+            _finalColor.A = 0;
         }
 
         public void LoadContent(ContentManager content)
@@ -37,7 +40,7 @@ namespace ParticleEffects.System.Effects
             _origin = _texture.CalculateCenter();
         }
 
-        public Particle CreateParticle()
+        public void InitializeParticle(Particle particle)
         {
             var offset = new Vector2(
                 (float)(_random.Next(_radius) * Math.Cos(_random.Next(360))),
@@ -48,20 +51,14 @@ namespace ParticleEffects.System.Effects
             var velocity = new Vector2(-(offset.X * 0.5f), 0);
             var acceleration = new Vector2(0, -_random.Next(200));
 
-            var finalColor = Color.Yellow;
-            finalColor.A = 0;
-
-            var particle = new Particle();
             particle.Initialize(
                 _texture, _origin,
                 3000,
                 position, velocity, acceleration, 0.96f,
                 0, 0, 1,
                 0.5f, -0.1f, 0, 1,
-                Color.Red, finalColor, 2750
+                Color.Red, _finalColor, 2750
             );
-
-            return particle;
         }
     }
 }

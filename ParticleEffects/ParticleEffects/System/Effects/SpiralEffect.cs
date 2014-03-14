@@ -8,6 +8,8 @@ namespace ParticleEffects.System.Effects
 {
     public class SpiralEffect : IEffect
     {
+        private readonly Color _finalColor;
+        private readonly Vector2 _acceleration;
         private Texture2D _texture;
         private Vector2 _origin;
 
@@ -24,6 +26,9 @@ namespace ParticleEffects.System.Effects
             NewParticleAmount = 1;
             BurstFrequency = 16;
             BlendState = BlendState.NonPremultiplied;
+
+            _finalColor = new Color();
+            _acceleration = new Vector2(0, 75);
         }
 
         public void LoadContent(ContentManager content)
@@ -32,22 +37,18 @@ namespace ParticleEffects.System.Effects
             _origin = _texture.CalculateCenter();
         }
 
-        public Particle CreateParticle()
+        public void InitializeParticle(Particle particle)
         {
-            var particle = new Particle();
             var velocity = new Vector2((float)(100.0f * Math.Cos(Duration)), (float)(100.0f * Math.Sin(Duration)));
-            var acceleration = new Vector2(0, 75);
 
             particle.Initialize(
                 _texture, _origin,
                 3000,
-                Position, velocity, acceleration, 1,
+                Position, velocity, _acceleration, 1,
                 0, 2, 0.99f,
                 0.2f, 0.2f, -0.1f, 1,
-                Color.DarkRed, new Color(), 3000
+                Color.DarkRed, _finalColor, 3000
             );
-
-            return particle;
         }
     }
 }

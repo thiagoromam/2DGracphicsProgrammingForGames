@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -8,13 +7,9 @@ namespace ParticleEffects.System
     public class EffectGenerator : IEffectInitializer
     {
         private readonly IEffect _effect;
-        private readonly List<Particle> _particles;
         private readonly int _initialDuration;
-
-        public Vector2 Position
-        {
-            set { _effect.Position = value; }
-        }
+        private readonly Particle[] _particles;
+        private int _particlesCount;
 
         public EffectGenerator(IEffect effect)
         {
@@ -22,11 +17,12 @@ namespace ParticleEffects.System
             _initialDuration = _effect.Duration;
             _effect.Duration = 0;
             _effect.BurstCountdown = 0;
-            _particles = new List<Particle>();
+            _particles = new Particle[2000];
         }
 
-        public void Initialize()
+        public void Start(Vector2 position)
         {
+            _effect.Position = position;
             _effect.Duration = _initialDuration;
             _effect.BurstCountdown = _effect.BurstFrequency;
         }
@@ -44,29 +40,41 @@ namespace ParticleEffects.System
             if (_effect.BurstCountdown <= 0 && _effect.Duration > 0)
             {
                 for (var i = 0; i < _effect.NewParticleAmount; ++i)
-                    _particles.Add(_effect.CreateParticle());
+                    _effect.InitializeParticle(GetParticle());
 
                 _effect.BurstCountdown = _effect.BurstFrequency;
             }
 
             if (_effect.Duration > 0)
                 _effect.Duration -= gameTime.ElapsedGameTime.Milliseconds;
-
-            for (var i = _particles.Count - 1; i >= 0; --i)
-            {
+            
+            for (var i = 0; i < _particlesCount; ++i)
                 _particles[i].Update(gameTime);
-
-                if (!_particles[i].IsAlive)
-                    _particles.RemoveAt(i);
-            }
         }
 
         public void Draw(SpriteBatch spriteBatch)
         {
             spriteBatch.Begin(SpriteSortMode.FrontToBack, _effect.BlendState);
-            for (var i = 0; i < _particles.Count; ++i)
+            for (var i = 0; i < _particlesCount; ++i)
                 _particles[i].Draw(spriteBatch);
+
             spriteBatch.End();
+        }
+
+        public Particle GetParticle()
+        {
+            Particle particle;
+            for (var i = 0; i < _particlesCount; ++i)
+            {
+                particle = _particles[i];
+                if (!particle.IsAlive)
+                    return particle;
+            }
+
+            particle = new Particle();
+            _particles[_particlesCount++] = particle;
+
+            return particle;
         }
     }
 }

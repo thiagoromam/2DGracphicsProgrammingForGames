@@ -8,8 +8,10 @@ namespace ParticleEffects.System.Effects
 {
     public class SmokeEffect : IEffect
     {
-        private readonly int _radius;
         private readonly Random _random;
+        private readonly int _radius;
+        private readonly Color _initialColor;
+        private readonly Color _finalColor;
         private Texture2D _texture;
         private Vector2 _origin;
 
@@ -18,6 +20,7 @@ namespace ParticleEffects.System.Effects
         public int BurstCountdown { get; set; }
         public int NewParticleAmount { get; private set; }
         public BlendState BlendState { get; private set; }
+
         public Vector2 Position { set; private get; }
 
         public SmokeEffect()
@@ -27,8 +30,11 @@ namespace ParticleEffects.System.Effects
             BurstFrequency = 16;
             BlendState = BlendState.Additive;
 
-            _radius = 50;
             _random = new Random();
+            _radius = 50;
+            _initialColor = Color.Black;
+            _initialColor.A = 128;
+            _finalColor = new Color(32, 32, 32, 0);
         }
 
         public void LoadContent(ContentManager content)
@@ -37,7 +43,7 @@ namespace ParticleEffects.System.Effects
             _origin = _texture.CalculateCenter();
         }
 
-        public Particle CreateParticle()
+        public void InitializeParticle(Particle particle)
         {
             var age = 5000 + _random.Next(5000);
             var fadeAge = age - _random.Next(100);
@@ -53,20 +59,14 @@ namespace ParticleEffects.System.Effects
 
             var scaleVelocity = _random.Next(10) / 50f;
 
-            var initialColor = Color.Black;
-            initialColor.A = 128;
-
-            var particle = new Particle();
             particle.Initialize(
                 _texture, _origin,
                 age,
                 position, velocity, acceleration, 1,
                 0, 0, 1,
                 0.6f, scaleVelocity, 0, 3,
-                initialColor, new Color(32, 32, 32, 0), fadeAge
+                _initialColor, _finalColor, fadeAge
             );
-
-            return particle;
         }
     }
 }

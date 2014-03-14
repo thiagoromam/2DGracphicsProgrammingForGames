@@ -10,6 +10,7 @@ namespace ParticleEffects.System.Effects
     {
         private readonly int _radius;
         private readonly Random _random;
+        private readonly Vector2 _acceleration;
         private Texture2D _texture;
         private Vector2 _origin;
 
@@ -27,8 +28,9 @@ namespace ParticleEffects.System.Effects
             BurstFrequency = 16;
             BlendState = BlendState.NonPremultiplied;
 
-            _radius = 20;
             _random = new Random();
+            _radius = 20;
+            _acceleration = new Vector2(0, 400);
         }
 
         public void LoadContent(ContentManager content)
@@ -37,7 +39,7 @@ namespace ParticleEffects.System.Effects
             _origin = _texture.CalculateCenter();
         }
 
-        public Particle CreateParticle()
+        public void InitializeParticle(Particle particle)
         {
             var age = 3000 + _random.Next(5000);
             var fadeAge = age / 2;
@@ -55,23 +57,20 @@ namespace ParticleEffects.System.Effects
                 velocity.X *= 0.025f;
             }
 
-            var acceleration = new Vector2(0, 400);
-
             var rotationVelocity = velocity.X / 50.0f;
             var scale = 0.1f + _random.Next(10) / 50.0f;
             var scaleVelocity = (_random.Next(10) - 5) / 50.0f;
 
-            var particle = new Particle();
+            var initialColor = new Color((byte)(_random.Next(128) + 128), 0, 0);
+
             particle.Initialize(
                 _texture, _origin,
                 age,
-                position, velocity, acceleration, 1,
+                position, velocity, _acceleration, 1,
                 0, rotationVelocity, 0.97f,
                 scale, scaleVelocity, 0, 1,
-                new Color((byte)(_random.Next(128) + 128), 0, 0), Color.Black, fadeAge
+                initialColor, Color.Black, fadeAge
             );
-
-            return particle;
         }
     }
 }
