@@ -13,7 +13,7 @@ namespace Core
 		private readonly MainGame _game;
         private readonly Joystick _joystick;
         private Vector2 _center;
-        private readonly EffectManager _effectManager;
+        private readonly EffectPool _effectPool;
         private readonly IEffectInitializer _effect;
 
         public TestComponent(MainGame game)
@@ -21,8 +21,8 @@ namespace Core
 			_game = game;
             _game.BackgroundColor = Color.Black;
             
-            _effectManager = new EffectManager();
-            _effect = _effectManager.Add(new FireEffect());
+            _effectPool = new EffectPool();
+            _effect = _effectPool.Add(new MovingFlameEffect());
             _joystick = Joystick.Player1;
 		}
 	
@@ -33,7 +33,7 @@ namespace Core
 		
         public void LoadContent(ContentManager content)
 		{
-            _effectManager.LoadContent(content);
+            _effectPool.LoadContent(content);
 		}
 		
         public void Update(GameTime gameTime)
@@ -41,12 +41,12 @@ namespace Core
             if (_joystick.IsFirePressed)
                 _effect.Start(_center);
 
-            _effectManager.Update(gameTime);
+            _effectPool.Update(gameTime);
 		}
 		
         public void Draw(SpriteBatch spriteBatch)
 		{
-            _effectManager.Draw(spriteBatch);
+            _effectPool.Draw(spriteBatch);
 		}
     }
 }

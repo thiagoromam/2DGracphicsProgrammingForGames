@@ -1,23 +1,21 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
-using Microsoft.Xna.Framework.Graphics;
 
 namespace ParticleEffects.System
 {
-    public class EffectGenerator : IEffectInitializer
+    public class EffectBehavior : IEffectInitializer
     {
         private readonly IEffect _effect;
         private readonly int _initialDuration;
-        private readonly Particle[] _particles;
-        private int _particlesCount;
+        private readonly IParticleInitializer _particleManager;
 
-        public EffectGenerator(IEffect effect)
+        public EffectBehavior(IEffect effect, IParticleInitializer particleManager)
         {
             _effect = effect;
+            _particleManager = particleManager;
             _initialDuration = _effect.Duration;
             _effect.Duration = 0;
             _effect.BurstCountdown = 0;
-            _particles = new Particle[2000];
         }
 
         public void Start(Vector2 position)
@@ -40,41 +38,13 @@ namespace ParticleEffects.System
             if (_effect.BurstCountdown <= 0 && _effect.Duration > 0)
             {
                 for (var i = 0; i < _effect.NewParticleAmount; ++i)
-                    _effect.InitializeParticle(GetParticle());
+                    _particleManager.InitializeParticle();
 
                 _effect.BurstCountdown = _effect.BurstFrequency;
             }
 
             if (_effect.Duration > 0)
                 _effect.Duration -= gameTime.ElapsedGameTime.Milliseconds;
-            
-            for (var i = 0; i < _particlesCount; ++i)
-                _particles[i].Update(gameTime);
-        }
-
-        public void Draw(SpriteBatch spriteBatch)
-        {
-            spriteBatch.Begin(SpriteSortMode.FrontToBack, _effect.BlendState);
-            for (var i = 0; i < _particlesCount; ++i)
-                _particles[i].Draw(spriteBatch);
-
-            spriteBatch.End();
-        }
-
-        public Particle GetParticle()
-        {
-            Particle particle;
-            for (var i = 0; i < _particlesCount; ++i)
-            {
-                particle = _particles[i];
-                if (!particle.IsAlive)
-                    return particle;
-            }
-
-            particle = new Particle();
-            _particles[_particlesCount++] = particle;
-
-            return particle;
         }
     }
 }

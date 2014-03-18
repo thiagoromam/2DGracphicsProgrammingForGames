@@ -138,8 +138,11 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="System\EffectGenerator.cs" />
+    <Compile Include="System\EffectBehavior.cs" />
     <Compile Include="System\EffectManager.cs" />
+    <Compile Include="System\EffectPool.cs" />
+    <Compile Include="System\IParticleInitializer.cs" />
+    <Compile Include="System\ParticleManager.cs" />
     <Compile Include="System\Effects\ExplosionEffect.cs" />
     <Compile Include="System\Effects\FireEffect.cs" />
     <Compile Include="System\Effects\FirewallEffect.cs" />
@@ -150,6 +153,7 @@
     <Compile Include="System\IEffect.cs" />
     <Compile Include="System\IEffectInitializer.cs" />
     <Compile Include="System\Particle.cs" />
+    <Compile Include="System\ParticlePool.cs" />
     <Compile Include="TestComponent.cs" />
   </ItemGroup>
   <ItemGroup>

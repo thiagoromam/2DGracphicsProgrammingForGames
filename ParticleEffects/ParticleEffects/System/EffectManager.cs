@@ -1,42 +1,39 @@
-﻿using System.Collections.Generic;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace ParticleEffects.System
 {
-    public class EffectManager
+    public class EffectManager : IEffectInitializer
     {
-        private readonly List<EffectGenerator> _effects;
+        private readonly ParticleManager _particleManager;
+        private readonly EffectBehavior _effectBehavior;
 
-        public EffectManager()
+        public EffectManager(ParticlePool particlePool, IEffect effect)
         {
-            _effects = new List<EffectGenerator>();
+            _particleManager = new ParticleManager(particlePool, effect);
+            _effectBehavior = new EffectBehavior(effect, _particleManager);
         }
 
-        public IEffectInitializer Add(IEffect effect)
+        public void Start(Vector2 position)
         {
-            var effectGenerator = new EffectGenerator(effect);
-            _effects.Add(effectGenerator);
-            return effectGenerator;
+            _effectBehavior.Start(position);
         }
 
         public void LoadContent(ContentManager content)
         {
-            for (var i = 0; i < _effects.Count; ++i)
-                _effects[i].LoadContent(content);
+            _effectBehavior.LoadContent(content);
         }
 
         public void Update(GameTime gameTime)
         {
-            for (var i = 0; i < _effects.Count; ++i)
-                _effects[i].Update(gameTime);
+            _effectBehavior.Update(gameTime);
+            _particleManager.Update(gameTime);
         }
 
         public void Draw(SpriteBatch spriteBatch)
         {
-            for (var i = 0; i < _effects.Count; ++i)
-                _effects[i].Draw(spriteBatch);
+            _particleManager.Draw(spriteBatch);
         }
     }
 }
