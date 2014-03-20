@@ -1,5 +1,4 @@
 using System;
-using Windows.UI;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -71,13 +70,13 @@ namespace Core
             const int height = 256;
 
             var colors = new Color[width * height];
-            _snowmanInverted.GetData(colors);
+            _snowman.GetData(colors);
 
             for (var i = 0; i < width; ++i)
             {
                 for (var j = 0; j < height; ++j)
                 {
-                    var index = i + (width * j);
+                    var index = j + (width * i);
                     var distance = Math.Sqrt(Math.Pow(i - _position.X, 2) + Math.Pow(j - _position.Y, 2));
                     const double radius = 50;
 
