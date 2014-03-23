@@ -3,7 +3,6 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Resources;
-using Color = Microsoft.Xna.Framework.Color;
 
 // ReSharper disable once CheckNamespace
 // ReSharper disable ForCanBeConvertedToForeach
@@ -19,6 +18,7 @@ namespace Core
         private Vector2 _snowmanOrigin;
         private Vector2[] _positions;
         private Vector2 _centerOfScreen;
+        private double _maxDistanceSquare;
 
         public TestComponent(MainGame game)
         {
@@ -32,6 +32,7 @@ namespace Core
             _screenWidth = viewport.Width;
             _screenHeight = viewport.Height;
             _centerOfScreen = viewport.CalculateCenterOfScreen();
+            _maxDistanceSquare = Math.Sqrt(Math.Pow(_centerOfScreen.X, 2) + Math.Pow(_centerOfScreen.Y, 2));
         }
 
         public void LoadContent(ContentManager content)
@@ -84,7 +85,9 @@ namespace Core
             {
                 for (var j = 0; j < _screenHeight; j++)
                 {
-                    const int blurAmount = 5;
+                    var distanceSquare = Math.Sqrt(Math.Pow(i - _centerOfScreen.X, 2) + Math.Pow(j - _centerOfScreen.Y, 2));
+
+                    var blurAmount = (int)Math.Floor(10 * distanceSquare / _maxDistanceSquare);
 
                     var index = i + (_screenWidth * j);
                     var previousIndex = index - blurAmount;
